@@ -1,4 +1,5 @@
 import pygame as pg
+import math
 
 pg.init()
 pg.key.set_repeat(5, 5)
@@ -6,6 +7,8 @@ turning_right = False
 moving_back = False
 moving_forward = False
 turning_left = False
+
+
 
 clock = pg.time.Clock()
 running = True
@@ -17,24 +20,30 @@ x = 30
 y = 30
 angle = 0
 while running:
+    delta_time = clock.tick(60)/1000
+    delta_time=max(0.001, min(0.1, delta_time))
     screen.fill((51,63,127))
-    clock.tick(60)
-    screen.blit(player_img, (x, y))
-    hitbox = pg.Rect(x, y, player_img.get_width(), player_img.get_height())
+
+    player_cpy = pg.transform.rotate(player_img, angle)
+    screen.blit(player_cpy, (x - int(player_cpy.get_width() / 2), y - int(player_cpy.get_height() / 2)))
     
-    #AI solution lines 26-28
+    hitbox = pg.Rect(x, y, player_img.get_width(), player_img.get_height())
+
     rotated_img = pg.transform.rotate(player_img, angle)
-    screen.blit(rotated_img, (x, y))
-    hitbox = pg.Rect(x, y, rotated_img.get_width(), rotated_img.get_height())
+    
+    hitbox = pg.Rect(x - int(player_cpy.get_width() / 2), y - int(player_cpy.get_height() / 2), rotated_img.get_width(), rotated_img.get_height())
     
     if turning_right == True:
-        angle += 90*delta_time
-    if turning_left == True:
         angle -= 90*delta_time
+    if turning_left == True:
+        angle += 90*delta_time
+    rad = math.radians(-angle)
     if moving_forward == True:
-        y -=50*delta_time
+        x += math.sin(rad) * 3
+        y -= math.cos(rad) * 3
     if moving_back == True:
-        y +=50*delta_time
+        x -= math.sin(rad) * 3
+        y += math.cos(rad) * 3
         
     for e in pg.event.get():
         if e.type == pg.QUIT:
@@ -57,7 +66,6 @@ while running:
                 moving_forward = False
             if e.key == pg.K_DOWN:
                 moving_back = False
-    delta_time = clock.tick(60)/1000
-    delta_time=max(0.001, min(0.1, delta_time))
+
     
     pg.display.flip()
