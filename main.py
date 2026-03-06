@@ -9,23 +9,28 @@ turning_left = False
 
 clock = pg.time.Clock()
 running = True
-screen = pg.display.set_mode((640, 480))
+screen = pg.display.set_mode((1000, 1000))
 player_img = pg.image.load("MapIcon_0.png").convert_alpha()
 #delta time consistency solution is from a video
 delta_time = 0.1
 x = 30
 y = 30
-
+angle = 0
 while running:
-    screen.fill((0,0,0))
+    screen.fill((51,63,127))
     clock.tick(60)
     screen.blit(player_img, (x, y))
-    hitbox = pg.Rect(x, 30, player_img.get_width(), player_img.get_height())
+    hitbox = pg.Rect(x, y, player_img.get_width(), player_img.get_height())
+    
+    #AI solution lines 26-28
+    rotated_img = pg.transform.rotate(player_img, angle)
+    screen.blit(rotated_img, (x, y))
+    hitbox = pg.Rect(x, y, rotated_img.get_width(), rotated_img.get_height())
     
     if turning_right == True:
-        x +=50*delta_time
+        angle += 90*delta_time
     if turning_left == True:
-        x -=50*delta_time
+        angle -= 90*delta_time
     if moving_forward == True:
         y -=50*delta_time
     if moving_back == True:
@@ -54,6 +59,5 @@ while running:
                 moving_back = False
     delta_time = clock.tick(60)/1000
     delta_time=max(0.001, min(0.1, delta_time))
-    
     
     pg.display.flip()
