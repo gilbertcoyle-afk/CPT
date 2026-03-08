@@ -1,3 +1,5 @@
+#all assests are from the Legacy Console Edition of Minecraft source code leak
+
 import pygame as pg
 import math
 import pathfinding
@@ -26,8 +28,7 @@ color = 0
 counter = 0
 crim_x = 100
 crim_y = 100
-crim_r = False
-crim_l = False
+
 
 while running:
     delta_time = clock.tick(60)/1000
@@ -49,10 +50,10 @@ while running:
     if counter in range (1, 150):
         counter +=1
     elif counter == 0:
-        path = pathfinding.find_path(scrn_w, scrn_h, -20, -20, x, y )
+        path = pathfinding.find_path(scrn_w - 5, scrn_h - 5, scrn_w - (scrn_w - 5), scrn_h - (scrn_h - 5), x, y )
         counter += 1
     else:
-        path = pathfinding.find_path(scrn_w, scrn_h, -20, -20, x, y )
+        path = pathfinding.find_path(scrn_w - 5, scrn_h - 5, scrn_w - (scrn_w - 5), scrn_h - (scrn_h - 5), x, y )
         counter = 1
 
     end_x, end_y = path
@@ -65,19 +66,41 @@ while running:
     turn = 90 * delta_time
     
     if diff > 0:
-        mod = 1
-    else:
         mod = -1
+    else:
+        mod = 1
     
     if abs(diff) < turn:
         crim_angle = theta
     else:
         crim_angle += turn * mod
 
+    if end_x == crim_x and end_y == crim_y:
+        path = pathfinding.find_path(scrn_w - 5, scrn_h - 5, scrn_w - (scrn_w - 5), scrn_h - (scrn_h - 5), x, y )
+        end_x, end_y = path
+
+        theta = math.degrees(pathfinding.make_path(crim_x, crim_y, end_x, end_y))
+        diff = (theta - crim_angle + 180) % 360 - 180
+
+        turn = 90 * delta_time
+        
+        if diff > 0:
+            mod = -1
+        else:
+            mod = 1
+        
+        if abs(diff) < turn:
+            crim_angle = theta
+        else:
+            crim_angle += turn * mod
+
+
+    crim_rad = math.radians(-crim_angle)
+    crim_x += math.sin(crim_rad) * 4 * delta_time * 60 
+    crim_y -= math.cos(crim_rad) * 4 * delta_time * 60
+    
     criminal_cpy = pg.transform.rotate(criminal, crim_angle)
     screen.blit(criminal_cpy, (crim_x - int(criminal_cpy.get_width() / 2), crim_y - int(criminal_cpy.get_height() / 2)))
-    crim_r = False
-    crim_l = False
     
     x = max(player_img.get_width() / 2, min(scrn_w - (player_img.get_width() / 2), x))
     y = max(player_img.get_height() / 2, min(scrn_h - (player_img.get_height() / 2), y))
