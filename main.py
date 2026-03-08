@@ -9,11 +9,14 @@ turning_right = False
 moving_back = False
 moving_forward = False
 turning_left = False
-
+scrn_h = 1000
+scrn_w = 1000
 clock = pg.time.Clock()
 running = True
-screen = pg.display.set_mode((1000, 1000))
+screen = pg.display.set_mode((scrn_w, scrn_h))
 criminal = pg.image.load("MapIcon_0.png").convert_alpha()
+crim_angle = 0
+
 #delta time consistency solution is from a video
 delta_time = 0.1
 x = 30
@@ -23,7 +26,8 @@ color = 0
 counter = 0
 crim_x = 100
 crim_y = 100
-
+crim_r = False
+crim_l = False
 
 while running:
     delta_time = clock.tick(60)/1000
@@ -41,14 +45,42 @@ while running:
     player_cpy = pg.transform.rotate(player_img, angle)
     screen.blit(player_cpy, (x - int(player_cpy.get_width() / 2), y - int(player_cpy.get_height() / 2)))
     
-    criminal_cpy = pg.transform.rotate(player_img, angle)
+
+    if counter in range (1, 150):
+        counter +=1
+    elif counter == 0:
+        path = pathfinding.find_path(scrn_w, scrn_h, -20, -20, x, y )
+        counter += 1
+    else:
+        path = pathfinding.find_path(scrn_w, scrn_h, -20, -20, x, y )
+        counter = 1
+
+    end_x, end_y = path
+
+    theta = math.degrees(pathfinding.make_path(crim_x, crim_y, end_x, end_y))
+
+    #claude did this line
+    diff = (theta - crim_angle + 180) % 360 - 180
+
+    turn = 90 * delta_time
+    
+    if diff > 0:
+        mod = 1
+    else:
+        mod = -1
+    
+    if abs(diff) < turn:
+        crim_angle = theta
+    else:
+        crim_angle += turn * mod
+
+    criminal_cpy = pg.transform.rotate(criminal, crim_angle)
     screen.blit(criminal_cpy, (crim_x - int(criminal_cpy.get_width() / 2), crim_y - int(criminal_cpy.get_height() / 2)))
-
-    hitbox = pg.Rect(x, y, player_img.get_width(), player_img.get_height())
-
-    rotated_img = pg.transform.rotate(player_img, angle)
-    x = max(player_img.get_width() / 2, min(1000 - (player_img.get_width() / 2), x))
-    y = max(player_img.get_height() / 2, min(1000 - (player_img.get_height() / 2), y))
+    crim_r = False
+    crim_l = False
+    
+    x = max(player_img.get_width() / 2, min(scrn_w - (player_img.get_width() / 2), x))
+    y = max(player_img.get_height() / 2, min(scrn_h - (player_img.get_height() / 2), y))
     
     
     if turning_right == True:
@@ -84,16 +116,5 @@ while running:
                 moving_forward = False
             if e.key == pg.K_DOWN:
                 moving_back = False
-    if counter in range (1, 100):
-        counter +=1
-    elif counter == 0:
-        path = pathfinding.find_path(980, 980, -20, -20, x, y )
-        counter += 1
-    else:
-        path = pathfinding.find_path(980, 980, -20, -20, x, y )
-        counter = 1
-    print(path)
-    
+
     pg.display.flip()
-    
-direction = pathfinding.make_path(0, 0, 5, 6)
