@@ -106,6 +106,10 @@ while running:
     y = max(player_img.get_height() / 2, min(scrn_h - (player_img.get_height() / 2), y))
     
     
+    crim_x = max(criminal.get_width() / 2, min(scrn_w - (criminal.get_width() / 2), crim_x))
+    crim_y = max(criminal.get_height() / 2, min(scrn_h - (criminal.get_height() / 2), crim_y))
+
+
     if turning_right == True:
         angle -= 90*delta_time
     if turning_left == True:
