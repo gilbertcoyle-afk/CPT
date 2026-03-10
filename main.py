@@ -26,8 +26,8 @@ y = 30
 angle = 0
 color = 0
 counter = 0
-crim_x = 100
-crim_y = 100
+crim_x = 800
+crim_y = 800
 
 
 while running:
@@ -49,11 +49,14 @@ while running:
 
     if counter in range (1, 150):
         counter +=1
+        if crim_x == end_x or hit_left_wall or hit_right_wall or hit_top_wall or hit_bottom_wall:
+           path = pathfinding.find_path(scrn_w - 100, scrn_h - 100, scrn_w - (scrn_w - 100), scrn_h - (scrn_h - 100), x, y )
+           counter = 1 
     elif counter == 0:
-        path = pathfinding.find_path(scrn_w - 5, scrn_h - 5, scrn_w - (scrn_w - 5), scrn_h - (scrn_h - 5), x, y )
+        path = pathfinding.find_path(scrn_w - 100, scrn_h - 100, scrn_w - (scrn_w - 100), scrn_h - (scrn_h - 100), x, y )
         counter += 1
-    else:
-        path = pathfinding.find_path(scrn_w - 5, scrn_h - 5, scrn_w - (scrn_w - 5), scrn_h - (scrn_h - 5), x, y )
+    elif counter == 150:
+        path = pathfinding.find_path(scrn_w - 100, scrn_h - 100, scrn_w - (scrn_w - 100), scrn_h - (scrn_h - 100), x, y )
         counter = 1
 
     end_x, end_y = path
@@ -75,25 +78,6 @@ while running:
     else:
         crim_angle += turn * mod
 
-    if end_x == crim_x and end_y == crim_y:
-        path = pathfinding.find_path(scrn_w - 5, scrn_h - 5, scrn_w - (scrn_w - 5), scrn_h - (scrn_h - 5), x, y )
-        end_x, end_y = path
-
-        theta = math.degrees(pathfinding.make_path(crim_x, crim_y, end_x, end_y))
-        diff = (theta - crim_angle + 180) % 360 - 180
-
-        turn = 90 * delta_time
-        
-        if diff > 0:
-            mod = -1
-        else:
-            mod = 1
-        
-        if abs(diff) < turn:
-            crim_angle = theta
-        else:
-            crim_angle += turn * mod
-
 
     crim_rad = math.radians(-crim_angle)
     crim_x += math.sin(crim_rad) * 4 * delta_time * 60 
@@ -106,8 +90,19 @@ while running:
     y = max(player_img.get_height() / 2, min(scrn_h - (player_img.get_height() / 2), y))
     
     
+    # AI
+    old_crim_x = crim_x
+    old_crim_y = crim_y
+
+    # Existing clamping code
     crim_x = max(criminal.get_width() / 2, min(scrn_w - (criminal.get_width() / 2), crim_x))
     crim_y = max(criminal.get_height() / 2, min(scrn_h - (criminal.get_height() / 2), crim_y))
+
+    # AI
+    hit_left_wall = (crim_x == criminal.get_width() / 2) and (old_crim_x != crim_x)
+    hit_right_wall = (crim_x == scrn_w - (criminal.get_width() / 2)) and (old_crim_x != crim_x)
+    hit_top_wall = (crim_y == criminal.get_height() / 2) and (old_crim_y != crim_y)
+    hit_bottom_wall = (crim_y == scrn_h - (criminal.get_height() / 2)) and (old_crim_y != crim_y)
 
 
     if turning_right == True:

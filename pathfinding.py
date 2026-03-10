@@ -4,12 +4,12 @@ import random as rand
 def make_path(start_x, start_y, end_x, end_y):
     adj = end_x - start_x
     opp = end_y - start_y
-    direction = math.atan2(opp, adj)
+    direction = math.atan2(adj, -opp)
     return direction
 
 def find_path(max_x, max_y, min_x, min_y, no_go_x, no_go_y):
-    x = range_gapped(min_x, max_x, (int(no_go_x) - 20), (int(no_go_x) + 20))
-    y = range_gapped(min_y, max_y, (int(no_go_y) - 20), (int(no_go_y) + 20))
+    x = range_gapped(min_x, max_x, (int(no_go_x) - 100), (int(no_go_x) + 100))
+    y = range_gapped(min_y, max_y, (int(no_go_y) - 100), (int(no_go_y) + 100))
     return x,y
 
 def range_gapped(start, end, gap_strt, gap_end):
